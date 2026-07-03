@@ -26,7 +26,12 @@ export default function ContactList() {
 
   return (
     <div className="page">
-      <h1>Contacts</h1>
+      <div className="page-header">
+        <h1>Contacts</h1>
+        <Link to="/contacts/new" className="button-link">
+          + Add Contact
+        </Link>
+      </div>
       <div className="filters">
         <input
           placeholder="Search by contact or organization name..."
