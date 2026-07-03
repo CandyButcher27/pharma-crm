@@ -47,6 +47,14 @@ export interface ContactDetail extends Contact {
   activities: Activity[];
 }
 
+export interface OrganizationWithContacts extends Organization {
+  contacts: Contact[];
+}
+
+export interface ActivityWithContact extends Activity {
+  contact: Contact;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json" },
@@ -83,4 +91,52 @@ export function addActivity(
 export function searchMedicines(q: string) {
   const params = new URLSearchParams({ q });
   return request<Medicine[]>(`/medicines?${params.toString()}`);
+}
+
+export function createMedicine(medicine: { name: string; manufacturer?: string | null }) {
+  return request<Medicine>(`/medicines`, {
+    method: "POST",
+    body: JSON.stringify(medicine),
+  });
+}
+
+export function listOrganizations(limit = 50, offset = 0) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  return request<Organization[]>(`/organizations?${params.toString()}`);
+}
+
+export function getOrganization(id: number) {
+  return request<OrganizationWithContacts>(`/organizations/${id}`);
+}
+
+export function createOrganization(org: {
+  name: string;
+  type: OrganizationType;
+  address?: string | null;
+  city?: string | null;
+  phone?: string | null;
+}) {
+  return request<Organization>(`/organizations`, {
+    method: "POST",
+    body: JSON.stringify(org),
+  });
+}
+
+export function createContact(contact: {
+  name: string;
+  role?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  organization_id: number;
+}) {
+  return request<Contact>(`/contacts`, {
+    method: "POST",
+    body: JSON.stringify(contact),
+  });
+}
+
+export function listFollowUps(dueBefore?: string) {
+  const params = new URLSearchParams();
+  if (dueBefore) params.set("due_before", dueBefore);
+  return request<ActivityWithContact[]>(`/follow-ups?${params.toString()}`);
 }
