@@ -5,6 +5,9 @@ backend/**/__pycache__/
 backend/*.db
 backend/.env
 
+# Tooling
+graphify-out/
+
 # OS
 .DS_Store
 Thumbs.db
