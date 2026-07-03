@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./App.css";
 import Nav from "./components/Nav";
 import ContactList from "./pages/ContactList";
 import ContactDetail from "./pages/ContactDetail";
