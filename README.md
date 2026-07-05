@@ -1,15 +1,30 @@
 # Pharma CRM
 
 A CRM for pharmaceutical medical representatives. Reps can search and browse
-contacts, view the organization each contact belongs to, read a contact's
-activity timeline, and log new activities (visit description, optional
-medicine discussed, and a follow-up date).
+contacts, filter by organization type or city, view the organization each
+contact belongs to, read a contact's activity timeline, log new activities
+(visit description, optional medicine discussed, and a follow-up date), and
+track open follow-ups on a dedicated dashboard.
 
 Organizations are one of three types: **hospital**, **retail store**, or
 **private doctor**.
 
 This is Phase 1: core data model, API, and UI. No authentication yet — see
 [Roadmap](#roadmap).
+
+## Features
+
+- **Contact directory** — search by name or organization, filter by
+  organization type and by city.
+- **Organization directory** — hospitals, retail stores, and private doctors,
+  filterable by city, each with its own roster of contacts.
+- **Activity timeline** — every logged visit against a contact, with an
+  optional medicine and follow-up date.
+- **Medicine catalog** — a shared, autocomplete-searchable list of medicines
+  used across every activity log.
+- **Follow-up dashboard** — open follow-ups grouped into Overdue, Due Today,
+  Due This Week, and Upcoming, with at-a-glance counts for each.
+- **Dark mode** — a light/dark toggle in the nav bar, remembered per browser.
 
 ## Stack
 
@@ -34,18 +49,20 @@ with a single contact — one uniform model instead of special-casing.
 ```
 backend/
   app/
-    main.py            FastAPI app, CORS, router mounts
-    database.py         engine / session / Base
-    models.py            SQLAlchemy models
-    schemas.py            Pydantic request/response models
-    crud.py                 query helpers (search, follow-ups, pagination)
-    routers/                organizations, contacts, medicines, activities
-    seed.py               sample data for local dev
+    main.py                FastAPI app, CORS, router mounts
+    database.py             engine / session / Base
+    models.py                SQLAlchemy models
+    schemas.py                 Pydantic request/response models
+    crud.py                      query helpers (search, cities, follow-ups, pagination)
+    routers/                       organizations, contacts, medicines, activities
+    seed.py                          sample data for local dev
 frontend/
   src/
-    api.ts                 typed fetch client for the backend
-    pages/                 ContactList, ContactDetail
-    components/            ActivityForm, Timeline
+    api.ts                  typed fetch client for the backend
+    pages/                    ContactList, ContactDetail, NewContact,
+                               OrganizationList, OrganizationDetail,
+                               MedicineList, FollowUps
+    components/                Nav, ActivityForm, Timeline
 ```
 
 ## Running locally
@@ -79,23 +96,24 @@ App at `http://localhost:5173`. It talks to the backend directly at
 
 ## API surface
 
-| Method | Path                              | Purpose                                   |
-|--------|-----------------------------------|--------------------------------------------|
-| GET    | `/contacts?q=&type=&limit=&offset=` | search / browse contacts                |
-| GET    | `/contacts/{id}`                  | contact + organization + activity timeline |
-| POST   | `/contacts`                       | create a contact                          |
-| GET    | `/organizations`                  | list organizations                        |
-| POST   | `/organizations`                  | create an organization                    |
-| GET    | `/organizations/{id}`             | organization + its contacts               |
-| GET    | `/medicines?q=`                   | medicine autocomplete                     |
-| POST   | `/medicines`                      | add a medicine                            |
-| POST   | `/contacts/{id}/activities`       | log an activity against a contact         |
-| GET    | `/follow-ups?due_before=`         | activities with an open follow-up date    |
+| Method | Path                                | Purpose                                     |
+|--------|-------------------------------------|----------------------------------------------|
+| GET    | `/contacts?q=&type=&city=&limit=&offset=` | search / browse contacts, filterable by city |
+| GET    | `/contacts/{id}`                    | contact + organization + activity timeline   |
+| POST   | `/contacts`                         | create a contact                             |
+| GET    | `/organizations?city=&type=`        | list organizations, filterable by city       |
+| POST   | `/organizations`                    | create an organization                       |
+| GET    | `/organizations/{id}`               | organization + its contacts                  |
+| GET    | `/organizations/cities`             | distinct list of cities in use               |
+| GET    | `/medicines?q=`                     | medicine autocomplete                        |
+| POST   | `/medicines`                        | add a medicine                               |
+| POST   | `/contacts/{id}/activities`         | log an activity against a contact            |
+| GET    | `/follow-ups?due_before=`           | activities with an open follow-up date       |
 
 ## Roadmap
 
 - **Phase 2:** rep accounts + auth; activities attribute to the logged-in rep
   (`activities.rep_id` already exists on the schema for this).
-- **Phase 3:** follow-up dashboard / reminders, built on `GET /follow-ups`.
+- ~~**Phase 3:** follow-up dashboard.~~ Shipped — see [Features](#features).
 - **Phase 4:** reporting (activity volume per medicine / org type), medicine
   catalog admin.
