@@ -26,11 +26,79 @@ This is Phase 1: core data model, API, and UI. No authentication yet — see
   Due This Week, and Upcoming, with at-a-glance counts for each.
 - **Dark mode** — a light/dark toggle in the nav bar, remembered per browser.
 
-## Stack
+## Setup instructions
 
-- **Backend:** FastAPI + SQLAlchemy. SQLite for local dev, PostgreSQL-ready
-  for deployment (swap via `DATABASE_URL`).
-- **Frontend:** React + TypeScript (Vite), React Router.
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+ and npm
+- (Optional) PostgreSQL, if you don't want to use the default SQLite setup
+
+### Backend
+
+```bash
+cd backend
+python -m venv .venv
+.venv/Scripts/activate        # .venv/bin/activate on macOS/Linux
+pip install -r requirements.txt
+python -m app.seed            # creates crm.db and loads sample data
+```
+
+By default the backend uses SQLite (`crm.db`, gitignored). To point at
+Postgres instead, copy `.env.example` to `.env` and set `DATABASE_URL`.
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+## How to run the project locally
+
+Run both servers in separate terminals.
+
+**Backend** (from `backend/`, with `.venv` activated):
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+API at `http://127.0.0.1:8000`, interactive docs at
+`http://127.0.0.1:8000/docs`.
+
+**Frontend** (from `frontend/`):
+
+```bash
+npm run dev
+```
+
+App at `http://localhost:5173`. It talks to the backend directly at
+`http://127.0.0.1:8000` — make sure that's running first.
+
+## Stack choices
+
+- **Backend — FastAPI + SQLAlchemy + Pydantic.** FastAPI gives request/response
+  validation and interactive API docs for free from type hints, which matters
+  more than a full-batteries framework like Django when the whole app is one
+  API with no admin panel or templating needs. SQLAlchemy is the ORM layer;
+  Pydantic schemas (`schemas.py`) keep the API's input/output shapes separate
+  from the database models (`models.py`) on purpose, so a client can never set
+  server-generated fields like `id` or `created_at`.
+- **Database — SQLite for local dev, Postgres-ready for deployment.**
+  `DATABASE_URL` is the only thing that changes between the two — the app
+  never hardcodes which database it's talking to.
+- **Frontend — React + TypeScript + Vite + React Router.** A single-page app
+  with client-side routing, no server-side rendering needed for an internal
+  CRM tool. Plain `fetch` through one typed client (`api.ts`) instead of a
+  data-fetching library — the API surface is small enough that React Query or
+  SWR would be more abstraction than the project needs.
+- **Styling — plain CSS with custom-property tokens**, not Tailwind or a
+  component library. Every color is a CSS variable, redefined per theme, which
+  is what makes the dark/light toggle a single attribute flip instead of a
+  duplicated stylesheet.
+- **Linting — oxlint** (Rust-based) instead of ESLint, for faster feedback in
+  a small frontend.
 
 ## Data model
 
@@ -65,35 +133,6 @@ frontend/
     components/                Nav, ActivityForm, Timeline
 ```
 
-## Running locally
-
-### Backend
-
-```bash
-cd backend
-python -m venv .venv
-.venv/Scripts/activate        # .venv/bin/activate on macOS/Linux
-pip install -r requirements.txt
-python -m app.seed            # creates crm.db and loads sample data
-uvicorn app.main:app --reload --port 8000
-```
-
-API docs at `http://127.0.0.1:8000/docs`.
-
-By default the backend uses SQLite (`crm.db`, gitignored). To point at
-Postgres instead, copy `.env.example` to `.env` and set `DATABASE_URL`.
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-App at `http://localhost:5173`. It talks to the backend directly at
-`http://127.0.0.1:8000` — make sure that's running.
-
 ## API surface
 
 | Method | Path                                | Purpose                                     |
@@ -110,6 +149,34 @@ App at `http://localhost:5173`. It talks to the backend directly at
 | POST   | `/contacts/{id}/activities`         | log an activity against a contact            |
 | GET    | `/follow-ups?due_before=`           | activities with an open follow-up date       |
 
+## Video walkthrough
+
+[Loom demo](https://www.loom.com/share/3f3117e1c85e4c648131b23f68053392) —
+a recorded walkthrough of the app: contact search and filters, logging an
+activity, the organization view, and the follow-up dashboard.
+
+## Deployed app link
+
+Not deployed — this runs locally only for now (see
+[Setup instructions](#setup-instructions) above).
+
+## A note on AI tool usage
+
+This project was built with **Claude Code** as a hands-on pair-programming
+tool, not as a one-shot generator. It was used to:
+
+- Scaffold the initial FastAPI + SQLAlchemy backend and the React + Vite
+  frontend from a plain-language spec of the data model and features.
+- Implement each feature (dark mode, the city filter, the follow-up
+  dashboard) as a reviewed, incremental change — each landed as its own
+  commit rather than one large diff.
+- Write and update this documentation, the interview-prep notes, and the
+  client-facing walkthrough artifact.
+
+Every change was read, smoke-tested (typecheck, lint, live requests against
+the running servers), and reviewed before being committed — nothing here was
+generated and merged unread.
+
 ## Roadmap
 
 - **Phase 2:** rep accounts + auth; activities attribute to the logged-in rep
@@ -117,3 +184,9 @@ App at `http://localhost:5173`. It talks to the backend directly at
 - ~~**Phase 3:** follow-up dashboard.~~ Shipped — see [Features](#features).
 - **Phase 4:** reporting (activity volume per medicine / org type), medicine
   catalog admin.
+
+## Client presentation
+
+[Claude Artifact walkthrough](https://claude.ai/code/artifact/362c482d-7dca-437d-8c8e-6b3c8d510402)
+— a stakeholder-facing overview of the stack, data model, and a guided demo
+journey through the app.
