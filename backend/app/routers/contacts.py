@@ -13,11 +13,12 @@ router = APIRouter(prefix="/contacts", tags=["contacts"])
 def search_contacts(
     q: Optional[str] = None,
     type: Optional[models.OrganizationType] = None,
+    city: Optional[str] = None,
     limit: int = 50,
     offset: int = 0,
     db: Session = Depends(get_db),
 ):
-    return crud.search_contacts(db, q=q, org_type=type, limit=limit, offset=offset)
+    return crud.search_contacts(db, q=q, org_type=type, city=city, limit=limit, offset=offset)
 
 
 @router.post("", response_model=schemas.ContactOut, status_code=201)

@@ -16,6 +16,17 @@ def create_organization(db: Session, org: schemas.OrganizationCreate) -> models.
     return db_org
 
 
+def list_cities(db: Session) -> list[str]:
+    rows = (
+        db.query(models.Organization.city)
+        .filter(models.Organization.city.isnot(None))
+        .distinct()
+        .order_by(models.Organization.city)
+        .all()
+    )
+    return [r[0] for r in rows]
+
+
 def get_organization(db: Session, org_id: int) -> Optional[models.Organization]:
     return (
         db.query(models.Organization)
@@ -25,8 +36,19 @@ def get_organization(db: Session, org_id: int) -> Optional[models.Organization]:
     )
 
 
-def list_organizations(db: Session, limit: int = 50, offset: int = 0):
-    return db.query(models.Organization).order_by(models.Organization.name).offset(offset).limit(limit).all()
+def list_organizations(
+    db: Session,
+    city: Optional[str] = None,
+    org_type: Optional[models.OrganizationType] = None,
+    limit: int = 50,
+    offset: int = 0,
+):
+    query = db.query(models.Organization)
+    if city:
+        query = query.filter(models.Organization.city.ilike(f"%{city}%"))
+    if org_type:
+        query = query.filter(models.Organization.type == org_type)
+    return query.order_by(models.Organization.name).offset(offset).limit(limit).all()
 
 
 # ---------- Contacts ----------
@@ -54,6 +76,7 @@ def search_contacts(
     db: Session,
     q: Optional[str] = None,
     org_type: Optional[models.OrganizationType] = None,
+    city: Optional[str] = None,
     limit: int = 50,
     offset: int = 0,
 ):
@@ -69,6 +92,9 @@ def search_contacts(
 
     if org_type:
         query = query.filter(models.Organization.type == org_type)
+
+    if city:
+        query = query.filter(models.Organization.city.ilike(f"%{city}%"))
 
     return query.order_by(models.Contact.name).offset(offset).limit(limit).all()
 

@@ -1,15 +1,28 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import crud, schemas
+from .. import crud, models, schemas
 from ..database import get_db
 
 router = APIRouter(prefix="/organizations", tags=["organizations"])
 
 
 @router.get("", response_model=list[schemas.OrganizationOut])
-def list_organizations(limit: int = 50, offset: int = 0, db: Session = Depends(get_db)):
-    return crud.list_organizations(db, limit=limit, offset=offset)
+def list_organizations(
+    city: Optional[str] = None,
+    type: Optional[models.OrganizationType] = None,
+    limit: int = 50,
+    offset: int = 0,
+    db: Session = Depends(get_db),
+):
+    return crud.list_organizations(db, city=city, org_type=type, limit=limit, offset=offset)
+
+
+@router.get("/cities", response_model=list[str])
+def list_cities(db: Session = Depends(get_db)):
+    return crud.list_cities(db)
 
 
 @router.post("", response_model=schemas.OrganizationOut, status_code=201)

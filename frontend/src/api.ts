@@ -67,10 +67,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-export function searchContacts(q: string, type?: OrganizationType) {
+export function searchContacts(q: string, type?: OrganizationType, city?: string) {
   const params = new URLSearchParams();
   if (q) params.set("q", q);
   if (type) params.set("type", type);
+  if (city) params.set("city", city);
   return request<ContactListItem[]>(`/contacts?${params.toString()}`);
 }
 
@@ -100,9 +101,15 @@ export function createMedicine(medicine: { name: string; manufacturer?: string |
   });
 }
 
-export function listOrganizations(limit = 50, offset = 0) {
+export function listOrganizations(limit = 50, offset = 0, city?: string, type?: OrganizationType) {
   const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (city) params.set("city", city);
+  if (type) params.set("type", type);
   return request<Organization[]>(`/organizations?${params.toString()}`);
+}
+
+export function listCities() {
+  return request<string[]>(`/organizations/cities`);
 }
 
 export function getOrganization(id: number) {

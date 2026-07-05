@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { searchContacts, type ContactListItem, type OrganizationType } from "../api";
+import { listCities, searchContacts, type ContactListItem, type OrganizationType } from "../api";
 
 const TYPE_LABELS: Record<OrganizationType, string> = {
   hospital: "Hospital",
@@ -11,18 +11,24 @@ const TYPE_LABELS: Record<OrganizationType, string> = {
 export default function ContactList() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState<OrganizationType | "">("");
+  const [city, setCity] = useState("");
+  const [cities, setCities] = useState<string[]>([]);
   const [contacts, setContacts] = useState<ContactListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    listCities().then(setCities).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     setLoading(true);
     setError(null);
-    searchContacts(query, type || undefined)
+    searchContacts(query, type || undefined, city || undefined)
       .then(setContacts)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [query, type]);
+  }, [query, type, city]);
 
   return (
     <div className="page">
@@ -43,6 +49,14 @@ export default function ContactList() {
           {Object.entries(TYPE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
+            </option>
+          ))}
+        </select>
+        <select value={city} onChange={(e) => setCity(e.target.value)}>
+          <option value="">All cities</option>
+          {cities.map((c) => (
+            <option key={c} value={c}>
+              {c}
             </option>
           ))}
         </select>

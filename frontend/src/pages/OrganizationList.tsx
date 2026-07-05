@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { createOrganization, listOrganizations, type Organization, type OrganizationType } from "../api";
+import {
+  createOrganization,
+  listCities,
+  listOrganizations,
+  type Organization,
+  type OrganizationType,
+} from "../api";
 
 const TYPE_LABELS: Record<OrganizationType, string> = {
   hospital: "Hospital",
@@ -13,6 +19,9 @@ export default function OrganizationList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [cityFilter, setCityFilter] = useState("");
+  const [cities, setCities] = useState<string[]>([]);
+
   const [name, setName] = useState("");
   const [type, setType] = useState<OrganizationType>("hospital");
   const [address, setAddress] = useState("");
@@ -21,15 +30,19 @@ export default function OrganizationList() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  useEffect(() => {
+    listCities().then(setCities).catch(() => {});
+  }, []);
+
   function load() {
     setLoading(true);
-    listOrganizations()
+    listOrganizations(50, 0, cityFilter || undefined)
       .then(setOrgs)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }
 
-  useEffect(load, []);
+  useEffect(load, [cityFilter]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -78,6 +91,17 @@ export default function OrganizationList() {
           {submitting ? "Adding..." : "Add Organization"}
         </button>
       </form>
+
+      <div className="filters">
+        <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)}>
+          <option value="">All cities</option>
+          {cities.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {loading && <p>Loading...</p>}
       {error && <p className="error">{error}</p>}
