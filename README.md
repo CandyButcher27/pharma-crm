@@ -1,5 +1,7 @@
 # Pharma CRM
 
+**[Video walkthrough](https://www.loom.com/share/3f3117e1c85e4c648131b23f68053392)**
+
 A CRM for pharmaceutical medical representatives. Reps can search and browse
 contacts, filter by organization type or city, view the organization each
 contact belongs to, read a contact's activity timeline, log new activities
@@ -149,12 +151,6 @@ frontend/
 | POST   | `/contacts/{id}/activities`         | log an activity against a contact            |
 | GET    | `/follow-ups?due_before=`           | activities with an open follow-up date       |
 
-## Video walkthrough
-
-[Loom demo](https://www.loom.com/share/3f3117e1c85e4c648131b23f68053392) —
-a recorded walkthrough of the app: contact search and filters, logging an
-activity, the organization view, and the follow-up dashboard.
-
 ## Deployed app link
 
 Not deployed — this runs locally only for now (see
@@ -162,16 +158,16 @@ Not deployed — this runs locally only for now (see
 
 ## A note on AI tool usage
 
-This project was built with **Claude Code** as a hands-on pair-programming
-tool, not as a one-shot generator. It was used to:
+Two tools, two different jobs:
 
-- Scaffold the initial FastAPI + SQLAlchemy backend and the React + Vite
-  frontend from a plain-language spec of the data model and features.
-- Implement each feature (dark mode, the city filter, the follow-up
-  dashboard) as a reviewed, incremental change — each landed as its own
-  commit rather than one large diff.
-- Write and update this documentation, the interview-prep notes, and the
-  client-facing walkthrough artifact.
+- **ChatGPT** — architecture and design decisions: the data model (why a
+  private doctor is an organization rather than a special case), the API
+  surface, and feature scoping.
+- **Claude Code** — coding and implementation: scaffolding the FastAPI +
+  SQLAlchemy backend and the React + Vite frontend, building each feature
+  (dark mode, the city filter, the follow-up dashboard) as a reviewed,
+  incremental change landed in its own commit, and writing this
+  documentation.
 
 Every change was read, smoke-tested (typecheck, lint, live requests against
 the running servers), and reviewed before being committed — nothing here was
