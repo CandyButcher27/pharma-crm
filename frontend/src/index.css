@@ -1,12 +1,67 @@
 :root {
-  --text: #27272a;
-  --text-muted: #6b7280;
-  --bg: #fafafa;
-  --border: #e5e7eb;
-  --accent: #2563eb;
+  --text: #1c2430;
+  --text-muted: #667085;
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --border: #e2e6ec;
+  --accent: #2f5d59;
+  --accent-hover: #244945;
+  --accent-soft: #e7f0ee;
+  --shadow: 0 1px 2px rgba(20, 30, 40, 0.06), 0 1px 8px rgba(20, 30, 40, 0.04);
+  --good: #2f7a4f;
+  --good-soft: #e6f4ea;
+  --warn: #b9772f;
+  --warn-soft: #fbf0e2;
+  --danger: #b3413a;
+  --danger-soft: #fbe9e7;
 
-  font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --text: #e7ebf0;
+  --text-muted: #97a3b3;
+  --bg: #10151b;
+  --surface: #171d25;
+  --border: #262f3a;
+  --accent: #7fb8ac;
+  --accent-hover: #99c9bf;
+  --accent-soft: #1c2b28;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.28);
+  --good: #6fbf87;
+  --good-soft: #17281d;
+  --warn: #d99a52;
+  --warn-soft: #2b2115;
+  --danger: #e0756a;
+  --danger-soft: #2c1917;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --text: #e7ebf0;
+    --text-muted: #97a3b3;
+    --bg: #10151b;
+    --surface: #171d25;
+    --border: #262f3a;
+    --accent: #7fb8ac;
+    --accent-hover: #99c9bf;
+    --accent-soft: #1c2b28;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.28);
+    --good: #6fbf87;
+    --good-soft: #17281d;
+    --warn: #d99a52;
+    --warn-soft: #2b2115;
+    --danger: #e0756a;
+    --danger-soft: #2c1917;
+
+    color-scheme: dark;
+  }
+}
+
+:root {
+  font: 15px/1.55 "Segoe UI", system-ui, Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -21,34 +76,42 @@
 
 body {
   margin: 0;
+  background: var(--bg);
+  transition: background 0.15s ease;
 }
 
 h1,
 h2,
 h3 {
-  font-weight: 600;
+  font-weight: 650;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 h1 {
-  font-size: 1.75rem;
-  margin: 0 0 0.5rem;
+  font-size: 1.6rem;
+  margin: 0 0 0.4rem;
 }
 
 h2 {
-  font-size: 1.25rem;
-  margin: 1.5rem 0 0.75rem;
+  font-size: 1.1rem;
+  margin: 1.75rem 0 0.75rem;
 }
 
 h3 {
-  font-size: 1rem;
+  font-size: 0.95rem;
   margin: 0;
 }
 
 p {
   margin: 0.25rem 0;
+  color: var(--text);
 }
 
 a {
   color: var(--accent);
+}
+
+::selection {
+  background: var(--accent-soft);
 }
